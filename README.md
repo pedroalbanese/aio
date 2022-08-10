@@ -1,9 +1,9 @@
 # AIO
-[![ISC License](http://img.shields.io/badge/license-ISC-blue.svg)](https://github.com/pedroalbanese/gzip/blob/master/LICENSE.md) 
-[![GoDoc](https://godoc.org/github.com/pedroalbanese/gzip?status.png)](http://godoc.org/github.com/pedroalbanese/gzip)
-[![Go Report Card](https://goreportcard.com/badge/github.com/pedroalbanese/gzip)](https://goreportcard.com/report/github.com/pedroalbanese/gzip)
-[![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/pedroalbanese/gzip)](https://golang.org)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/pedroalbanese/gzip)](https://github.com/pedroalbanese/gzip/releases)
+[![ISC License](http://img.shields.io/badge/license-ISC-blue.svg)](https://github.com/pedroalbanese/aio/blob/master/LICENSE.md) 
+[![GoDoc](https://godoc.org/github.com/pedroalbanese/aio?status.png)](http://godoc.org/github.com/pedroalbanese/aio)
+[![Go Report Card](https://goreportcard.com/badge/github.com/pedroalbanese/aio)](https://goreportcard.com/report/github.com/pedroalbanese/aio)
+[![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/pedroalbanese/aio)](https://golang.org)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/pedroalbanese/aio)](https://github.com/pedroalbanese/aio/releases)
 ### All-in-One Command-line Compression Tool for modern multi-core machines written in Go 
 <pre>Usage: aio [OPTION]... [FILE]
 Compress or uncompress FILE (by default, compress FILE in-place).
