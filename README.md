@@ -1,4 +1,4 @@
-# AIO
+# AIO Compress
 [![ISC License](http://img.shields.io/badge/license-ISC-blue.svg)](https://github.com/pedroalbanese/aio/blob/master/LICENSE.md) 
 [![GoDoc](https://godoc.org/github.com/pedroalbanese/aio?status.png)](http://godoc.org/github.com/pedroalbanese/aio)
 [![Go Report Card](https://goreportcard.com/badge/github.com/pedroalbanese/aio)](https://goreportcard.com/report/github.com/pedroalbanese/aio)
