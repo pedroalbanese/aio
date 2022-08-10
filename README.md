@@ -1,6 +1,7 @@
 # AIO Compress
 [![ISC License](http://img.shields.io/badge/license-ISC-blue.svg)](https://github.com/pedroalbanese/aio/blob/master/LICENSE.md) 
 [![GoDoc](https://godoc.org/github.com/pedroalbanese/aio?status.png)](http://godoc.org/github.com/pedroalbanese/aio)
+[![GitHub downloads](https://img.shields.io/github/downloads/pedroalbanese/aio/total.svg?logo=github&logoColor=white)](https://github.com/pedroalbanese/aio/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/pedroalbanese/aio)](https://goreportcard.com/report/github.com/pedroalbanese/aio)
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/pedroalbanese/aio)](https://golang.org)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/pedroalbanese/aio)](https://github.com/pedroalbanese/aio/releases)
