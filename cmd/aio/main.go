@@ -1,4 +1,3 @@
-// Copyright (c) 2010, Andrei Vieru. All rights reserved.
 // Copyright (c) 2021, Pedro Albanese. All rights reserved.
 // Use of this source code is governed by a ISC license that
 // can be found in the LICENSE file.
@@ -17,6 +16,7 @@ import (
 	"compress/gzip"
 	"compress/zlib"
 	"github.com/dsnet/compress/bzip2"
+	"github.com/klauspost/compress/s2"
 	"github.com/klauspost/compress/zstd"
 	"github.com/pedroalbanese/brotli"
 	"github.com/pedroalbanese/lzma"
@@ -122,6 +122,8 @@ func main() {
 				*suffix = "zz"
 			} else if *algorithm == "bzip2" {
 				*suffix = "bz2"
+			} else if *algorithm == "s2" {
+				*suffix = "s2"
 			} else if *algorithm == "zstd" {
 				*suffix = "zst"
 			} else if *algorithm == "xz" {
@@ -205,6 +207,8 @@ func main() {
 			z, _ = zlib.NewReader(pr)
 		} else if *algorithm == "bzip2" {
 			z, _ = bzip2.NewReader(pr, nil)
+		} else if *algorithm == "s2" {
+			z = s2.NewReader(pr)
 		} else if *algorithm == "zstd" {
 			z, _ = zstd.NewReader(pr)
 		} else if *algorithm == "xz" {
@@ -247,6 +251,8 @@ func main() {
 					z = zlib.NewWriter(pw)
 				} else if *algorithm == "bzip2" {
 					z, _ = bzip2.NewWriter(pw, nil)
+				} else if *algorithm == "s2" {
+					z = s2.NewWriter(pw)
 				} else if *algorithm == "zstd" {
 					z, _ = zstd.NewWriter(pw)
 				} else if *algorithm == "xz" {
