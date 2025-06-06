@@ -151,18 +151,18 @@ func processFile(inFilePath string) error {
 		}
 
 		// Set suffix based on detected algorithm, if user did not set it
-		if !setByUser("s") {
+		if !setByUser("S") {
 			*suffix = getDefaultSuffix()
 		}
 	} else {
 		// Set default suffix if not provided by user
-		if !setByUser("s") {
+		if !setByUser("S") {
 			*suffix = getDefaultSuffix()
 		}
 	}
 
 	// Checks for conflicting flags
-	if *stdout == true && setByUser("s") == true {
+	if *stdout == true && setByUser("S") == true {
 		return fmt.Errorf("stdout set, suffix not used")
 	}
 	if *stdout == true && *force == true {
@@ -248,7 +248,7 @@ func processFile(inFilePath string) error {
 		if *stdout != true {
 			return fmt.Errorf("reading from stdin, can write only to stdout")
 		}
-		if setByUser("s") == true {
+		if setByUser("S") == true {
 			return fmt.Errorf("reading from stdin, suffix not needed")
 		}
 		stdin = true
