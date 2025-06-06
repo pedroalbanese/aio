@@ -6,20 +6,44 @@
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/pedroalbanese/aio)](https://golang.org)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/pedroalbanese/aio)](https://github.com/pedroalbanese/aio/releases)
 ### All-in-One Command-line Compression Tool for modern multi-core machines written in Go 
-<pre>Usage: aio [OPTION]... [FILE]
-Compress or uncompress FILE (by default, compress FILE in-place).
+<pre>Usage: ./aio [OPTION]... [FILEs ...]
+Compress or uncompress FILEs (by default, compress FILEs in-place).
 
- -a string
-       compression algorithm: bzip2, lzma, xz, zlib, zstd (default "gzip")
- -c    write on standard output, keep original files unchanged
- -cores int
-       number of cores to use for parallelization (default 1)
- -d    decompress; see also -c and -k
- -f    force overwrite of output file
- -h    print this help message
- -k    keep original files unchanged
- -s string
-       use provided suffix on compressed files (default "gz")
+  -1, --fast
+          set block size to 100k
+    -2    set block size to 200k
+    -3    set block size to 300k
+    -4    set block size to 400k
+    -5    set block size to 500k
+    -6    set block size to 600k
+    -7    set block size to 700k
+    -8    set block size to 800k
+  -9, --best
+        set block size to 900k (default)
+  -S string
+        use provided suffix on compressed files (default "gz")
+  --algorithm string
+        brotli, gzip, zlib, bzip2, s2, zstd, lzma, xz (default "gzip")
+  -c, --stdout
+        write on standard output, keep original files unchanged
+  --cores int
+        number of cores to use for parallelization
+  -d, --decompress
+        decompress; see also -c and -k
+  -f, --force
+        force overwrite of output file
+  -h, --help
+        print this help message
+  -k, --keep
+        keep original files unchanged
+  -l int
+        compression level (1 = fastest, 9 = best) (default 4)
+  -r, --recursive
+        operate recursively on directories
+  -t, --test
+        test compressed file integrity
+  -v, --verbose
+        be verbose
 
 With no FILE, or when FILE is -, read standard input.</pre>
 
@@ -27,4 +51,4 @@ With no FILE, or when FILE is -, read standard input.</pre>
 
 This project is licensed under the ISC License.
 
-##### Copyright (c) 2020-2022 Pedro F. Albanese - ALBANESE Research Lab.
+##### Copyright (c) 2020-2025 Pedro F. Albanese - ALBANESE Research Lab.
