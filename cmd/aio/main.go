@@ -99,7 +99,7 @@ func getDefaultSuffix() string {
 		return "lzma"
 	case "xz":
 		return "xz"
-	default: // brotli
+	default:
 		return "gz"
 	}
 }
