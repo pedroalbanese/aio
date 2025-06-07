@@ -647,6 +647,15 @@ func main() {
 	// Process each file
 	hasErrors := false
 	for _, file := range files {
+		if file == "-" {
+			err := processFile(file)
+			if err != nil {
+				log.Printf("%s: %v", file, err)
+				hasErrors = true
+			}
+			continue
+		}
+
 		info, err := os.Stat(file)
 		if err != nil {
 			log.Printf("%s: %v", file, err)
