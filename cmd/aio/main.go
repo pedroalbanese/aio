@@ -54,17 +54,6 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "Compress or uncompress FILEs (by default, compress FILEs in-place).\n\n")
 	getopt.PrintDefaults()
 	fmt.Fprintf(os.Stderr, "\nWith no FILE, or when FILE is -, read standard input.\n")
-	/*
-	fmt.Fprintf(os.Stderr, "\nSupported algorithms:\n")
-	fmt.Fprintf(os.Stderr, "  brotli - Google's Brotli algorithm\n")
-	fmt.Fprintf(os.Stderr, "  gzip   - GNU zip compression (default)\n")
-	fmt.Fprintf(os.Stderr, "  zlib   - zlib compression\n")
-	fmt.Fprintf(os.Stderr, "  bzip2  - bzip2 compression\n")
-	fmt.Fprintf(os.Stderr, "  s2     - Snappy2 compression (fast)\n")
-	fmt.Fprintf(os.Stderr, "  zstd   - Zstandard compression\n")
-	fmt.Fprintf(os.Stderr, "  lzma   - LZMA compression\n")
-	fmt.Fprintf(os.Stderr, "  xz     - XZ compression (LZMA2)\n")
- 	*/
 }
 
 // exit shows an error message and exits the program with error code
