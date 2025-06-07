@@ -563,7 +563,11 @@ func main() {
 	// Configure flags for compression levels (1–9)
 	for i := 1; i <= 9; i++ {
 		levelValue := i
-		flag.BoolFunc(strconv.Itoa(i), fmt.Sprintf("set compression level to %d", i), func(string) error {
+		explanation := fmt.Sprintf("set compression level to %d", i)
+		if i == 4 {
+			explanation += " (default)"
+		}
+		flag.BoolFunc(strconv.Itoa(i), explanation, func(string) error {
 			*level = levelValue
 			return nil
 		})
