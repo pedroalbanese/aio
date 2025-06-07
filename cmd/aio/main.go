@@ -50,10 +50,11 @@ var (
 
 // usage displays program usage instructions
 func usage() {
-	fmt.Fprintf(os.Stderr, "Usage: %s [OPTION]... [FILE] ...\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "Usage: %s [OPTION]... [FILE]...\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "Compress or uncompress FILEs (by default, compress FILEs in-place).\n\n")
 	getopt.PrintDefaults()
 	fmt.Fprintf(os.Stderr, "\nWith no FILE, or when FILE is -, read standard input.\n")
+	/*
 	fmt.Fprintf(os.Stderr, "\nSupported algorithms:\n")
 	fmt.Fprintf(os.Stderr, "  brotli - Google's Brotli algorithm\n")
 	fmt.Fprintf(os.Stderr, "  gzip   - GNU zip compression (default)\n")
@@ -63,6 +64,7 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "  zstd   - Zstandard compression\n")
 	fmt.Fprintf(os.Stderr, "  lzma   - LZMA compression\n")
 	fmt.Fprintf(os.Stderr, "  xz     - XZ compression (LZMA2)\n")
+ 	*/
 }
 
 // exit shows an error message and exits the program with error code
@@ -566,6 +568,9 @@ func main() {
 		if i == 4 {
 			explanation += " (default)"
 		}
+		if i == 9 {
+			explanation += " (equivalent to 4 in zstd and 11 in brotli)"
+		}
 		_ = flag.Bool(strconv.Itoa(i), false, explanation)
 	}
 
@@ -598,7 +603,7 @@ func main() {
 
 	// Validate compression level
 	if *level < 1 || *level > 11 {
-		exit("invalid compression level: must be between 1 and 9")
+		exit("invalid compression level: must be between 1 and 11")
 	}
 
 	// Validate algorithm
