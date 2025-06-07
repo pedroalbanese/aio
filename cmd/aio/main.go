@@ -1,5 +1,5 @@
 // Copyright (c) 2010, Andrei Vieru. All rights reserved.
-// Copyright (c) 2021, Pedro Albanese. All rights reserved.
+// Copyright (c) 2021, Pedro F. Albanese. All rights reserved.
 // Copyright (c) 2025: Pindorama
 //	Luiz Antônio Rangel (takusuman)
 // All rights reserved.
@@ -50,7 +50,7 @@ var (
 
 // usage displays program usage instructions
 func usage() {
-	fmt.Fprintf(os.Stderr, "Usage: %s [OPTION]... [FILEs ...]\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "Usage: %s [OPTION]... [FILE] ...\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "Compress or uncompress FILEs (by default, compress FILEs in-place).\n\n")
 	getopt.PrintDefaults()
 	fmt.Fprintf(os.Stderr, "\nWith no FILE, or when FILE is -, read standard input.\n")
@@ -562,8 +562,8 @@ func (w *writeCounter) Write(p []byte) (int, error) {
 func main() {
 	// Configure flags for compression levels (1–9)
 	for i := 1; i <= 9; i++ {
-		explanation := fmt.Sprintf("set block size to %dk", (i * 100))
-		if i == 9 {
+		explanation := fmt.Sprintf("compression level %d", i)
+		if i == 4 {
 			explanation += " (default)"
 		}
 		_ = flag.Bool(strconv.Itoa(i), false, explanation)
@@ -588,7 +588,7 @@ func main() {
 
 	// Check if someone has used '-#' for a compression level.
 	if !setByUser("l") {
-		for i := 1; i <= 9; i++ {
+		for i := 1; i <= 11; i++ {
 			if setByUser(strconv.Itoa(i)) {
 				*level = i
 				break
@@ -597,7 +597,7 @@ func main() {
 	}
 
 	// Validate compression level
-	if *level < 1 || *level > 9 {
+	if *level < 1 || *level > 11 {
 		exit("invalid compression level: must be between 1 and 9")
 	}
 
