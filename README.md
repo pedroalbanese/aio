@@ -6,7 +6,7 @@
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/pedroalbanese/aio)](https://golang.org)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/pedroalbanese/aio)](https://github.com/pedroalbanese/aio/releases)
 ### All-in-One Command-line Compression Tool for modern multi-core machines 
-<pre>Usage: aio [OPTION]... [FILE] ...
+<pre>Usage: aio [OPTION]... [FILE]...
 Compress or uncompress FILEs (by default, compress FILEs in-place).
 
   -1, --fast
