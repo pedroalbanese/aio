@@ -1,7 +1,9 @@
 // Copyright (c) 2010, Andrei Vieru. All rights reserved.
 // Copyright (c) 2021, Pedro F. Albanese. All rights reserved.
 // Copyright (c) 2025: Pindorama
+//
 //	Luiz Antônio Rangel (takusuman)
+//
 // All rights reserved.
 // Use of this source code is governed by a ISC license that
 // can be found in the LICENSE file.
@@ -54,6 +56,15 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "Compress or uncompress FILEs (by default, compress FILEs in-place).\n\n")
 	getopt.PrintDefaults()
 	fmt.Fprintf(os.Stderr, "\nWith no FILE, or when FILE is -, read standard input.\n")
+	fmt.Fprintf(os.Stderr, "\nSupported algorithms:\n")
+	fmt.Fprintf(os.Stderr, "  brotli - Google's Brotli algorithm\n")
+	fmt.Fprintf(os.Stderr, "  gzip   - GNU zip compression (default)\n")
+	fmt.Fprintf(os.Stderr, "  zlib   - zlib compression\n")
+	fmt.Fprintf(os.Stderr, "  bzip2  - bzip2 compression\n")
+	fmt.Fprintf(os.Stderr, "  s2     - Snappy2 compression (fast)\n")
+	fmt.Fprintf(os.Stderr, "  zstd   - Zstandard compression\n")
+	fmt.Fprintf(os.Stderr, "  lzma   - LZMA compression\n")
+	fmt.Fprintf(os.Stderr, "  xz     - XZ compression (LZMA2)\n")
 }
 
 // exit shows an error message and exits the program with error code
@@ -553,14 +564,11 @@ func (w *writeCounter) Write(p []byte) (int, error) {
 func main() {
 	// Configure flags for compression levels (1–9)
 	for i := 1; i <= 9; i++ {
-		explanation := fmt.Sprintf("compression level %d", i)
-		if i == 4 {
-			explanation += " (default)"
-		}
-		if i == 9 {
-			explanation += " (equivalent to 4 in zstd and 11 in brotli)"
-		}
-		_ = flag.Bool(strconv.Itoa(i), false, explanation)
+		levelValue := i
+		flag.BoolFunc(strconv.Itoa(i), fmt.Sprintf("set compression level to %d", i), func(string) error {
+			*level = levelValue
+			return nil
+		})
 	}
 
 	// Alias short flags with their long counterparts.
@@ -582,7 +590,7 @@ func main() {
 
 	// Check if someone has used '-#' for a compression level.
 	if !setByUser("l") {
-		for i := 1; i <= 11; i++ {
+		for i := 1; i <= 9; i++ {
 			if setByUser(strconv.Itoa(i)) {
 				*level = i
 				break
