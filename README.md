@@ -6,20 +6,20 @@
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/pedroalbanese/aio)](https://golang.org)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/pedroalbanese/aio)](https://github.com/pedroalbanese/aio/releases)
 ### All-in-One Command-line Compression Tool for modern multi-core machines 
-<pre>Usage: ./aio [OPTION]... [FILEs ...]
+<pre>Usage: aio [OPTION]... [FILE] ...
 Compress or uncompress FILEs (by default, compress FILEs in-place).
 
   -1, --fast
-          set block size to 100k
-    -2    set block size to 200k
-    -3    set block size to 300k
-    -4    set block size to 400k
-    -5    set block size to 500k
-    -6    set block size to 600k
-    -7    set block size to 700k
-    -8    set block size to 800k
+        compression level 1
+  -2    compression level 2
+  -3    compression level 3
+  -4    compression level 4 (default)
+  -5    compression level 5
+  -6    compression level 6
+  -7    compression level 7
+  -8    compression level 8
   -9, --best
-        set block size to 900k (default)
+        compression level 9
   -S string
         use provided suffix on compressed files (default "gz")
   --algorithm string
