@@ -19,7 +19,7 @@ Compress or uncompress FILEs (by default, compress FILEs in-place).
   -7    compression level 7
   -8    compression level 8
   -9, --best
-        compression level 9
+        compression level 9 (4 for zstd and 11 for brotli)
   -S string
         use provided suffix on compressed files (default "gz")
   --algorithm string
