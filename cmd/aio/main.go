@@ -337,10 +337,6 @@ func processFile(inFilePath string) error {
 				defer inFile.Close()
 			}
 
-			if *verbose {
-				fmt.Fprintf(os.Stderr, "%s: ", inFile.Name())
-			}
-
 			_, err = io.Copy(pw, inFile)
 			if err != nil {
 				pw.CloseWithError(err)
@@ -416,7 +412,9 @@ func processFile(inFilePath string) error {
 		}
 
 		if *verbose && !*stdout {
-			fmt.Fprintln(os.Stderr, "done")
+			logMu.Lock()
+			fmt.Fprintf(os.Stderr, "%s: done\n", inFilePath)
+			logMu.Unlock()
 		}
 	} else { // File compression
 		go func() {
@@ -604,7 +602,7 @@ func main() {
 	// Configure flags for compression levels (1–9)
 	for i := 1; i <= 9; i++ {
 		levelValue := i
-		explanation := fmt.Sprintf("set compression level to %d", i)
+		explanation := fmt.Sprintf("compression level %d", i)
 		if i == 4 {
 			explanation += " (default)"
 		}
@@ -659,7 +657,7 @@ func main() {
 		"zstd":   true,
 		"lzma":   true,
 		"xz":     true,
-		"lz4":     true,
+		"lz4":    true,
 	}
 	if !validAlgorithms[strings.ToLower(*algorithm)] {
 		exit(fmt.Sprintf("invalid algorithm: %s", *algorithm))
@@ -717,7 +715,6 @@ func main() {
 				}
 				return
 			}
-
 			info, err := os.Stat(file)
 			if err != nil {
 				log.Printf("%s: %v", file, err)
