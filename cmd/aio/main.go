@@ -28,6 +28,7 @@ import (
 	"github.com/pedroalbanese/brotli"
 	"github.com/pedroalbanese/lzma"
 	"github.com/pedroalbanese/xz"
+	"github.com/pierrec/lz4/v4"
 	"rsc.io/getopt"
 )
 
@@ -44,7 +45,7 @@ var (
 	test       = flag.Bool("t", false, "test compressed file integrity")
 	level      = flag.Int("l", 4, "compression level (1 = fastest, 9 = best)")
 	recursive  = flag.Bool("r", false, "operate recursively on directories")
-	algorithm  = flag.String("algorithm", "gzip", "brotli, gzip, zlib, bzip2, s2, zstd, lzma, xz")
+	algorithm  = flag.String("algorithm", "gzip", "brotli, zlib, bzip2, s2, zstd, lz4, lzma, xz")
 
 	stdin bool // Indicates if reading from standard input
 )
@@ -64,6 +65,7 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "  zstd   - Zstandard compression\n")
 	fmt.Fprintf(os.Stderr, "  lzma   - LZMA compression\n")
 	fmt.Fprintf(os.Stderr, "  xz     - XZ compression (LZMA2)\n")
+	fmt.Fprintf(os.Stderr, "  lz4    - LZ4 compression\n")
 }
 
 // exit shows an error message and exits the program with error code
@@ -100,6 +102,8 @@ func getDefaultSuffix() string {
 		return "lzma"
 	case "xz":
 		return "xz"
+	case "lz4":
+		return "lz4"
 	default:
 		return "gz"
 	}
@@ -130,6 +134,8 @@ func getAlgorithmFromExtension(filename string) (string, error) {
 		return "lzma", nil
 	case "xz":
 		return "xz", nil
+	case "lz4":
+		return "lz4", nil
 	case "br":
 		return "brotli", nil
 	default:
@@ -222,6 +228,9 @@ func processFile(inFilePath string) error {
 			r = zr
 		case "lzma":
 			lr := lzma.NewReader(inFile)
+			r = lr
+		case "lz4":
+			lr := lz4.NewReader(inFile)
 			r = lr
 		case "xz":
 			xr, err := xz.NewReader(inFile)
@@ -375,6 +384,8 @@ func processFile(inFilePath string) error {
 			r = zr
 		case "lzma":
 			r = lzma.NewReader(pr)
+		case "lz4":
+			r = lz4.NewReader(pr)
 		case "xz":
 			xr, err := xz.NewReader(pr)
 			if err != nil {
@@ -465,6 +476,43 @@ func processFile(inFilePath string) error {
 				}
 			case "lzma":
 				w = lzma.NewWriterLevel(counter, *level)
+			case "lz4":
+				var lvl lz4.CompressionLevel
+				switch *level {
+				case 0:
+					lvl = lz4.Fast
+				case 1:
+					lvl = lz4.Level1
+				case 2:
+					lvl = lz4.Level2
+				case 3:
+					lvl = lz4.Level3
+				case 4:
+					lvl = lz4.Level4
+				case 5:
+					lvl = lz4.Level5
+				case 6:
+					lvl = lz4.Level6
+				case 7:
+					lvl = lz4.Level7
+				case 8:
+					lvl = lz4.Level8
+				case 9:
+					lvl = lz4.Level9
+				default:
+					lvl = lz4.Fast // fallback
+				}
+
+				zw := lz4.NewWriter(counter)
+				options := []lz4.Option{
+					lz4.CompressionLevelOption(lvl),
+					lz4.ConcurrencyOption(*cores),
+				}
+				if err := zw.Apply(options...); err != nil {
+					pw.CloseWithError(err)
+					return
+				}
+				w = zw
 			case "xz":
 				w, err = xz.NewWriter(counter)
 				if err != nil {
@@ -594,8 +642,8 @@ func main() {
 	}
 
 	// Validate compression level
-	if *level < 1 || *level > 11 {
-		exit("invalid compression level: must be between 1 and 11")
+	if *level > 11 {
+		exit("invalid compression level: must be between 0 and 11")
 	}
 
 	// Validate algorithm
@@ -608,6 +656,7 @@ func main() {
 		"zstd":   true,
 		"lzma":   true,
 		"xz":     true,
+		"lz4":     true,
 	}
 	if !validAlgorithms[strings.ToLower(*algorithm)] {
 		exit(fmt.Sprintf("invalid algorithm: %s", *algorithm))
@@ -665,6 +714,7 @@ func main() {
 				}
 				return
 			}
+
 			info, err := os.Stat(file)
 			if err != nil {
 				log.Printf("%s: %v", file, err)
