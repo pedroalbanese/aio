@@ -20,6 +20,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/dsnet/compress/bzip2"
 	"github.com/klauspost/compress/s2"
@@ -308,6 +309,8 @@ func processFile(inFilePath string) error {
 	// Creates a pipe for communication between goroutines
 	pr, pw := io.Pipe()
 
+	var logMu sync.Mutex
+
 	// File decompression
 	if *decompress {
 		go func() {
@@ -420,7 +423,6 @@ func processFile(inFilePath string) error {
 				defer inFile.Close()
 			}
 
-			// Cria um contador para a saída
 			counter := &writeCounter{Writer: pw}
 
 			var w io.WriteCloser
@@ -453,7 +455,10 @@ func processFile(inFilePath string) error {
 					w = s2.NewWriter(counter)
 				}
 			case "zstd":
-				w, err = zstd.NewWriter(counter, zstd.WithEncoderLevel(zstd.EncoderLevel(*level)))
+				w, err = zstd.NewWriter(counter,
+					zstd.WithEncoderLevel(zstd.EncoderLevel(*level)),
+					zstd.WithEncoderConcurrency(*cores),
+				)
 				if err != nil {
 					pw.CloseWithError(err)
 					return
@@ -470,23 +475,19 @@ func processFile(inFilePath string) error {
 				w = brotli.NewWriterLevel(counter, *level)
 			}
 
+			inSize, err := io.Copy(w, inFile)
+			if err != nil {
+				w.Close()
+				pw.CloseWithError(err)
+				return
+			}
+
+			if err := w.Close(); err != nil {
+				pw.CloseWithError(err)
+				return
+			}
+
 			if *verbose {
-				fmt.Fprintf(os.Stderr, "%s: ", inFile.Name())
-
-				// Conta os bytes de entrada
-				inSize, err := io.Copy(w, inFile)
-				if err != nil {
-					w.Close()
-					pw.CloseWithError(err)
-					return
-				}
-
-				if err := w.Close(); err != nil {
-					pw.CloseWithError(err)
-					return
-				}
-
-				// Calcula as estatísticas
 				outSize := counter.bytesWritten
 				var ratio float64
 				if outSize > 0 {
@@ -495,24 +496,16 @@ func processFile(inFilePath string) error {
 					ratio = 0
 				}
 
-				fmt.Fprintf(os.Stderr, "%6.3f:1, %6.3f bits/byte, %5.2f%% saved, %d in, %d out.\n",
+				// Evita saída intercalada
+				logMu.Lock()
+				fmt.Fprintf(os.Stderr, "%s: %6.3f:1, %6.3f bits/byte, %5.2f%% saved, %d in, %d out.\n",
+					inFile.Name(),
 					ratio,
-					(8 / ratio), // bits por byte
+					(8 / ratio),
 					(100 * (1 - (1 / ratio))),
 					inSize,
 					outSize)
-			} else {
-				// Versão sem verbose
-				_, err = io.Copy(w, inFile)
-				if err != nil {
-					w.Close()
-					pw.CloseWithError(err)
-					return
-				}
-				if err := w.Close(); err != nil {
-					pw.CloseWithError(err)
-					return
-				}
+				logMu.Unlock()
 			}
 		}()
 
@@ -637,6 +630,7 @@ func main() {
 	// In fact, if the default value of cores is zero, it
 	// will use all the cores of the machine.
 	runtime.GOMAXPROCS(*cores)
+	//	fmt.Printf("Usando até %d threads (CPU disponíveis: %d)\n", runtime.GOMAXPROCS(0), runtime.NumCPU())
 
 	// Get list of files to process
 	files := flag.Args()
@@ -644,59 +638,84 @@ func main() {
 		files = []string{"-"} // default to stdin
 	}
 
+	if *cores <= 0 {
+		*cores = runtime.NumCPU()
+	}
+
 	// Process each file
 	hasErrors := false
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+	sem := make(chan struct{}, *cores)
+
 	for _, file := range files {
-		if file == "-" {
-			err := processFile(file)
-			if err != nil {
-				log.Printf("%s: %v", file, err)
-				hasErrors = true
-			}
-			continue
-		}
+		file := file
+		wg.Add(1)
 
-		info, err := os.Stat(file)
-		if err != nil {
-			log.Printf("%s: %v", file, err)
-			hasErrors = true
-			continue
-		}
+		go func(f string) {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
 
-		if info.IsDir() {
-			if *recursive {
-				err = filepath.Walk(file, func(path string, fi os.FileInfo, err error) error {
-					if err != nil {
-						log.Printf("%s: %v", path, err)
-						hasErrors = true
-						return nil
-					}
-					if !fi.IsDir() {
-						if err := processFile(path); err != nil {
-							log.Printf("%s: %v", path, err)
-							hasErrors = true
-						}
-					}
-					return nil
-				})
+			if file == "-" {
+				err := processFile(file)
 				if err != nil {
 					log.Printf("%s: %v", file, err)
 					hasErrors = true
 				}
-			} else {
-				log.Printf("%s is a directory (use -r to process recursively)", file)
-				hasErrors = true
+				return
 			}
-		} else {
-			err := processFile(file)
+			info, err := os.Stat(file)
 			if err != nil {
 				log.Printf("%s: %v", file, err)
 				hasErrors = true
+				return
 			}
-		}
+
+			if info.IsDir() {
+				if *recursive {
+					err = filepath.Walk(f, func(path string, fi os.FileInfo, err error) error {
+						if err != nil {
+							mu.Lock()
+							log.Printf("%s: %v", path, err)
+							hasErrors = true
+							mu.Unlock()
+							return nil
+						}
+						if !fi.IsDir() {
+							if err := processFile(path); err != nil {
+								mu.Lock()
+								log.Printf("%s: %v", path, err)
+								hasErrors = true
+								mu.Unlock()
+							}
+						}
+						return nil
+					})
+					if err != nil {
+						mu.Lock()
+						log.Printf("%s: %v", f, err)
+						hasErrors = true
+						mu.Unlock()
+					}
+				} else {
+					mu.Lock()
+					log.Printf("%s is a directory (use -r to process recursively)", f)
+					hasErrors = true
+					mu.Unlock()
+				}
+			} else {
+				if err := processFile(f); err != nil {
+					mu.Lock()
+					log.Printf("%s: %v", f, err)
+					hasErrors = true
+					mu.Unlock()
+				}
+			}
+		}(file)
 	}
 
-	// Exit with error code if any failures occurred
+	wg.Wait()
 	if hasErrors {
 		os.Exit(1)
 	}
