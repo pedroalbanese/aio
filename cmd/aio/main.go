@@ -608,6 +608,9 @@ func main() {
 		if i == 4 {
 			explanation += " (default)"
 		}
+		if i == 4 {
+			explanation += " (equivalent to 4 in zstd and 11 in brotli)"
+		}		
 		flag.BoolFunc(strconv.Itoa(i), explanation, func(string) error {
 			*level = levelValue
 			return nil
