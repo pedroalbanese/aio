@@ -674,14 +674,6 @@ func main() {
 		exit("invalid number of cores")
 	}
 
-	// From 'go doc runtime.GOMAXPROCS':
-	// "It defaults to the value of runtime.NumCPU.
-	// If n < 1, it does not change the current setting."
-	// In fact, if the default value of cores is zero, it
-	// will use all the cores of the machine.
-	runtime.GOMAXPROCS(*cores)
-	//	fmt.Printf("Usando até %d threads (CPU disponíveis: %d)\n", runtime.GOMAXPROCS(0), runtime.NumCPU())
-
 	// Get list of files to process
 	files := flag.Args()
 	if len(files) == 0 {
