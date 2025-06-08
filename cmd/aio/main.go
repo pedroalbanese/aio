@@ -146,7 +146,7 @@ func getAlgorithmFromExtension(filename string) (string, error) {
 // processFile processes a single file (compression, decompression, or test)
 // Returns an error if any issue occurs during processing
 func processFile(inFilePath string) error {
-	if *decompress && inFilePath != "-" {
+	if (*decompress || *test) && inFilePath != "-" {
 		detectedAlgo, err := getAlgorithmFromExtension(inFilePath)
 		if err != nil {
 			return fmt.Errorf("failed to detect algorithm: %v", err)
