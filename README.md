@@ -23,7 +23,7 @@ Compress or uncompress FILEs (by default, compress FILEs in-place).
   -S string
         use provided suffix on compressed files (default "gz")
   --algorithm string
-        brotli, gzip, zlib, bzip2, s2, zstd, lzma, xz (default "gzip")
+        brotli, zlib, bzip2, s2, zstd, lz4, lzma, xz (default "gzip")
   -c, --stdout
         write on standard output, keep original files unchanged
   --cores int
