@@ -122,13 +122,13 @@ func getAlgorithmFromExtension(filename string) (string, error) {
 	switch ext {
 	case "gz":
 		return "gzip", nil
-	case "zlib":
+	case "zz", "zlib":
 		return "zlib", nil
 	case "bz2":
 		return "bzip2", nil
 	case "s2":
 		return "s2", nil
-	case "zst":
+	case "zst", "zstd":
 		return "zstd", nil
 	case "lzma":
 		return "lzma", nil
